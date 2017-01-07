@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 
 /**
@@ -16,9 +17,16 @@ import java.awt.image.BufferedImage;
  */
 public class Maxis extends JFrame {
 
-    int x;
-    int y;
+    boolean isRunning = true;
+    int fps = 30;
+    int windowWidth = 600;
+    int windowHeight = 480;
+
     BufferedImage backBuffer;
+    Insets insets;
+    InputHandler input;
+
+    int x = 0;
 
     public static void main(String[] args) {
 
@@ -32,9 +40,6 @@ public class Maxis extends JFrame {
      *  This method stsarts the game and runs it in a loop
      */
     public void run() {
-
-        boolean isRunning = true;
-        int fps = 10;
 
         initialize();
 
@@ -66,16 +71,18 @@ public class Maxis extends JFrame {
      */
     void initialize() {
 
-        int windowWidth = 600;
-        int windowHeight = 480;
-
-        backBuffer = new BufferedImage(600, 480, BufferedImage.TYPE_INT_RGB);
-
         setTitle("Maxis");
         setSize(windowWidth, windowHeight);
         setResizable(false);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setVisible(true);
+
+        insets = getInsets();
+        setSize(insets.left + windowWidth + insets.right, insets.top + windowHeight + insets.bottom);
+
+        backBuffer = new BufferedImage(windowWidth, windowHeight, BufferedImage.TYPE_INT_RGB);
+
+        input = new InputHandler(this);
 
     }
 
@@ -84,8 +91,15 @@ public class Maxis extends JFrame {
      *  around and check for win conditions, etc
      */
     void update() {
-        x++;
-        y++;
+
+        if (input.isKeyDown(KeyEvent.VK_RIGHT)) {
+            x += 5;
+        }
+
+        if (input.isKeyDown(KeyEvent.VK_LEFT)) {
+            x -= 5;
+        }
+
     }
 
     /**
@@ -96,10 +110,10 @@ public class Maxis extends JFrame {
         Graphics bbg = backBuffer.getGraphics();
 
         bbg.setColor(Color.WHITE);
-        bbg.fillRect(0, 0, 600, 480);
+        bbg.fillRect(0, 0, windowWidth, windowHeight);
 
         bbg.setColor(Color.BLACK);
-        bbg.drawOval(x, y, 20, 20);
+        bbg.drawOval(x, 10, 20, 20);
 
         g.drawImage(backBuffer, 0, 0, this);
     }
